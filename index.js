@@ -180,16 +180,17 @@ function GiveRoleByXP() {
             rows[i].xp_count <= cfgXP.level[j].max
           ) {
             const Guilds = bot.guilds.cache.get(cfg.guild);
-            var user = Guilds.members.cache.find(
-              (user) => user.id === rows[i].user_id
-            );
-            var arg = user.roles.cache.some(
-              (role) => role.id === cfgXP.role[j]
-            );
-            if (!arg) {
-              //RemoveUserRole(cfgXP.role, rows[i].user_id);
-              GiveUserRole(cfgXP.role[j], rows[i].user_id);
-            }
+            var user = Guilds.members.cache.find((user) => user.id === rows[i].user_id );
+try {
+  var arg = user.roles.cache.some((role) => role.id === cfgXP.role[j]);
+
+  if (!arg) {
+    //RemoveUserRole(cfgXP.role, rows[i].user_id);
+    GiveUserRole(cfgXP.role[j], rows[i].user_id);
+  }
+} catch (error) {
+  console.log(error)
+}
           }
         }
       }
@@ -202,6 +203,52 @@ function GiveRoleByXP() {
   }, cfgXP.roleTimeout);
 }
 
+/*
+function GiveRoleByXP() {
+  db.query(`SELECT * FROM xp`, function (err, rows) {
+    if (!err) {
+      for (var i = 0; i < rows.length; i++) {
+        var j = 0;
+        loop();
+        function loop(){
+          if (
+            rows[i].xp_count >= cfgXP.level[j].min &&
+            rows[i].xp_count <= cfgXP.level[j].max
+          ) {
+            const Guilds = bot.guilds.cache.get(cfg.guild);
+            var user = Guilds.members.cache.find((user) => user.id === rows[i].user_id );
+            console.log(user)
+            
+            var arg = user.roles.cache.some(
+              (role) => role.id === cfgXP.role[j]
+            );
+            if (!arg) {
+              //RemoveUserRole(cfgXP.role, rows[i].user_id);
+              GiveUserRole(cfgXP.role[j], rows[i].user_id);
+            }
+            
+          }
+          
+          if(j < cfgXP.role.length){
+            setTimeout(() => {
+              loop();
+            }, 1500);
+          }
+          j++;
+        }
+        for (var j = 0; j < cfgXP.role.length; j++) {
+          
+        }
+      }
+    } else {
+      console.log(err);
+    }
+  });
+  setTimeout(() => {
+    GiveRoleByXP();
+  }, cfgXP.roleTimeout);
+}
+*/
 function GiveUserRole(roleID, userID) {
   const Guilds = bot.guilds.cache.get(cfg.guild);
   var role = Guilds.roles.cache.find((role) => role.id === roleID);
@@ -316,6 +363,15 @@ bot.on("message", (msg) => {
   }
   });
 
+  bot.on("message", (msg) => {
+    if (msg.content == "test123") {
+      if (msg.author.id == cfg.admin_id) {
+        const Guilds = bot.guilds.cache.get(cfg.guild);
+        const User = bot.fetchUser("475388811195580437");
+        console.log(User);
+      }
+    }
+    });
 
 /* -------------------------------------------------------------------------- */
 /*                               Slash Commands                               */
@@ -382,7 +438,7 @@ bot.ws.on("INTERACTION_CREATE", async (interaction) => {
     });
   }
   /* ------------------------------- Leaderboard ------------------------------ */
-  if (command === "test") {
+  if (command === "leaderboard") {
     db.query(
       `select * FROM xp ORDER BY xp_count DESC`,
       async function (err, rows) {
