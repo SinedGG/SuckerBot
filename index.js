@@ -337,7 +337,11 @@ function AddCommands(){
     data: {
         name: "xp",
         description: "Система досвіду"
-    }
+    },
+    data: {
+      name: "leaderboard",
+      description: "Таблиця лідерів"
+  }
 });
 }
 
@@ -345,6 +349,7 @@ bot.ws.on("INTERACTION_CREATE", async (interaction) => {
   const command = interaction.data.name.toLowerCase();
   const args = interaction.data.options;
 
+  /* ----------------------------------- XP ----------------------------------- */
   if (command === "xp") {
     db.query(`SELECT xp_count FROM xp WHERE user_id=${interaction.member.user.id}`, async function (err, rows) {
         const Guilds = bot.guilds.cache.get(cfg.guild);
@@ -376,6 +381,48 @@ bot.ws.on("INTERACTION_CREATE", async (interaction) => {
     });
     });
   }
+  /* ------------------------------- Leaderboard ------------------------------ */
+  if (command === "test") {
+    db.query(
+      `select * FROM xp ORDER BY xp_count DESC`,
+      async function (err, rows) {
+        if (err) {
+          logger(err, "db err");
+        } else {
+          var content = "";
+  
+          for (var i = 0; i < rows.length; i++) {
+            var name = rows[i].name.split("#");
+            content += `${i + 1}. ${name[0]} - ${rows[i].xp_count} \n`;
+          }
+          const embed = new Discord.MessageEmbed()
+            .setURL("https://sded.cf/img/main.jpg")
+            .setAuthor("Система досвіду ", "https://sded.cf/img/main.jpg")
+            .setColor("#ff6700")
+            .setDescription(content)
+            .setFooter("SDED Community")
+            .setThumbnail("https://media.forgecdn.net/avatars/67/361/636163095202189901.png"
+            );
+  
+          let data = {
+            content: embed,
+          };
+  
+          if (typeof embed === "object") {
+            data = await createAPIMessage(interaction, embed);
+          }
+  
+          bot.api.interactions(interaction.id, interaction.token).callback.post({
+            data: {
+              type: 4,
+              data,
+            },
+          });
+        }
+      }
+    );
+  }
+  
 });
 
 /* -------------------------------------------------------------------------- */
