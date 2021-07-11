@@ -69,7 +69,11 @@ function voiceXP() {
             !Guildmember.user.bot &&
             !Guilds.voiceStates.cache.get(Guildmember.id).selfDeaf
           ) {
+            if(Guilds.voiceStates.cache.get(Guildmember.id).selfMute){
+              addXP(Guildmember.user.tag, Guildmember.id, 1, 0);
+            }else{
             addXP(Guildmember.user.tag, Guildmember.id, cfgXP.voice, 0);
+            }
           }
         }
       }
