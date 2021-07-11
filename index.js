@@ -193,7 +193,7 @@ try {
     GiveUserRole(cfgXP.role[j], rows[i].user_id);
   }
 } catch (error) {
-  console.log(error)
+  console.log(`Id: ${rows[i].user_id} TypeError: Cannot read property 'roles' of undefined`)
 }
           }
         }
