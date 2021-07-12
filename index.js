@@ -451,7 +451,7 @@ bot.ws.on("INTERACTION_CREATE", async (interaction) => {
         } else {
           var content = "";
   
-          for (var i = 0; i < rows.length; i++) {
+          for (var i = 0; i < 10; i++) {
             var name = rows[i].name.split("#");
             content += `${i + 1}. ${name[0]} - ${rows[i].xp_count} \n`;
           }
