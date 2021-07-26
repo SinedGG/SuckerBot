@@ -1,5 +1,6 @@
 var fs = require("fs");
 const moment = require("moment");
+require('dotenv').config()
 
 const Discord = require("discord.js");
 const bot = new Discord.Client();
@@ -8,10 +9,10 @@ const bot = new Discord.Client();
 const mysql = require("mysql");
 const db = mysql.createPool({
   connectionLimit: 10,
-  host: "eu-cdbr-west-03.cleardb.net",
-  user: "b6fcf24dc064b8",
-  database: "heroku_78e5c33621a5ead",
-  password: "893fb5ef",
+  host: "process.env.DB_HOST",
+  user: "process.env.DB_USER",
+  database: "process.env.DB_NAME",
+  password: "process.env.DB_PASSWORD",
 });
 
 var cfgXP = JSON.parse(fs.readFileSync("./config/xp.json", "utf8"));
@@ -515,7 +516,7 @@ function setActivity(){
 /*                                    Ready                                   */
 /* -------------------------------------------------------------------------- */
 bot.on("ready", () => {
-  logger(`Logged in as ${bot.user.tag}!`, "bot");
+  logger(`Logged in as ${bot.user.tag} Version - ${cfg.version}`, "bot");
 
   voiceXP();
   GiveRoleByXP();
@@ -525,4 +526,4 @@ bot.on("ready", () => {
 
 
 
-bot.login("NTg1ODc1MDk5NDkyNTQ4NjQ4.XPf0tA.9cw6tmNv5stzPwvexfrw3bGmoC4");
+bot.login(process.env.DS_TOKEN);
