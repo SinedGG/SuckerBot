@@ -682,7 +682,7 @@ bot.on('voiceStateUpdate', (oldState, newState) => {
       newState.member.voice.setChannel(channel.id)
     })
   }
-
+  logger(`Створено канал користувачем ${newState.member.user.username }`, "VoiceChannels");
 });
 
 
