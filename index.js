@@ -1,10 +1,10 @@
 var fs = require("fs");
 const moment = require("moment");
-require('dotenv').config()
+require("dotenv").config();
 
-const Discord = require("discord.js");
+const  Discord = require("discord.js");
+
 const bot = new Discord.Client();
-
 
 const mysql = require("mysql");
 const db = mysql.createPool({
@@ -16,6 +16,7 @@ const db = mysql.createPool({
 });
 
 var cfgXP = JSON.parse(fs.readFileSync("./config/xp.json", "utf8"));
+var cfgLEAD = JSON.parse(fs.readFileSync("./config/leaderboard.json", "utf8"));
 var cfg = JSON.parse(fs.readFileSync("./config/main.json", "utf8"));
 
 /* -------------------------------------------------------------------------- */
@@ -70,10 +71,10 @@ function voiceXP() {
             !Guildmember.user.bot &&
             !Guilds.voiceStates.cache.get(Guildmember.id).selfDeaf
           ) {
-            if(Guilds.voiceStates.cache.get(Guildmember.id).selfMute){
+            if (Guilds.voiceStates.cache.get(Guildmember.id).selfMute) {
               addXP(Guildmember.user.tag, Guildmember.id, 1, 0);
-            }else{
-            addXP(Guildmember.user.tag, Guildmember.id, cfgXP.voice, 0);
+            } else {
+              addXP(Guildmember.user.tag, Guildmember.id, cfgXP.voice, 0);
             }
           }
         }
@@ -85,34 +86,49 @@ function voiceXP() {
   }, cfgXP.voiceTimeout);
 }
 /* --------------------------------- Text XP -------------------------------- */
-function textXP(msg){
-  if(!msg.member.user.bot){
-    db.query(`SELECT text_timeout FROM xp WHERE user_id=${msg.author.id}`, function (err, rows) {
-      if (err) {
-        logger(err, "db err");
-      }else{
-        if (rows == null || rows.length == 0) {
-          console.log("pizda")
-          addXP(msg.author.tag, msg.author.id, 1, 1);
-        }else{
-          db.query(`SELECT text_timeout FROM xp WHERE user_id=${msg.author.id}`, function (err, rows) {
-            if (err){
-              logger(err, "db err");
-            }else{
-              //console.log("If "+Math.abs((rows[0].text_timeout - moment().minute())));
-              if(Math.abs((rows[0].text_timeout - moment().minute())) >= cfgXP.textDelay){
-                addXP(msg.author.tag, msg.author.id, cfgXP.text, 1);
-                db.query(`UPDATE xp SET text_timeout = ${moment().minute()} WHERE user_id="${msg.author.id}"`,  function (err, rows) {
-                  if (err){
-                    logger(err, "db err");
-                  }});
+function textXP(msg) {
+  if (!msg.member.user.bot) {
+    db.query(
+      `SELECT text_timeout FROM xp WHERE user_id=${msg.author.id}`,
+      function (err, rows) {
+        if (err) {
+          logger(err, "db err");
+        } else {
+          if (rows == null || rows.length == 0) {
+            console.log("pizda");
+            addXP(msg.author.tag, msg.author.id, 1, 1);
+          } else {
+            db.query(
+              `SELECT text_timeout FROM xp WHERE user_id=${msg.author.id}`,
+              function (err, rows) {
+                if (err) {
+                  logger(err, "db err");
+                } else {
+                  //console.log("If "+Math.abs((rows[0].text_timeout - moment().minute())));
+                  if (
+                    Math.abs(rows[0].text_timeout - moment().minute()) >=
+                    cfgXP.textDelay
+                  ) {
+                    addXP(msg.author.tag, msg.author.id, cfgXP.text, 1);
+                    db.query(
+                      `UPDATE xp SET text_timeout = ${moment().minute()} WHERE user_id="${
+                        msg.author.id
+                      }"`,
+                      function (err, rows) {
+                        if (err) {
+                          logger(err, "db err");
+                        }
+                      }
+                    );
+                  }
+                }
               }
-            }
-          });
+            );
+          }
         }
       }
-    });
-}
+    );
+  }
 }
 
 /* ------------------------------- XP function ------------------------------ */
@@ -120,14 +136,18 @@ function addXP(userNAME, userID, xp_count, arg) {
   db.query(`SELECT * FROM xp WHERE user_id=${userID}`, function (err, rows) {
     if (err) {
       logger(err, "db err");
-    }else{
+    } else {
       if (rows == null || rows.length == 0) {
         db.query(
-          `INSERT xp(name, user_id, xp_count) VALUES ("${userNAME}", ${userID}, 0)`, function (err) {
+          `INSERT xp(name, user_id, xp_count) VALUES ("${userNAME}", ${userID}, 0)`,
+          function (err) {
             if (err) {
               logger(err, "db err");
             } else {
-              logger(`Користиувача ${userNAME} було додано до бази даних`, "database");
+              logger(
+                `Користиувача ${userNAME} було додано до бази даних`,
+                "database"
+              );
               db.query(
                 `UPDATE xp SET xp_count = xp_count + ${xp_count} WHERE user_id="${userID}"`,
                 function (err) {
@@ -152,13 +172,13 @@ function addXP(userNAME, userID, xp_count, arg) {
               console.log(err);
             } else {
               var content = "";
-              if(arg == 0){
+              if (arg == 0) {
                 content = "перебування у голосовому каналі";
               }
-              if(arg == 1){
+              if (arg == 1) {
                 content = "написання повідомлення";
               }
-              if(arg == 2){
+              if (arg == 2) {
                 content = "відправдення реакції";
               }
 
@@ -175,6 +195,7 @@ function addXP(userNAME, userID, xp_count, arg) {
 }
 
 
+
 function GiveRoleByXP() {
   db.query(`SELECT * FROM xp`, function (err, rows) {
     if (!err) {
@@ -185,17 +206,34 @@ function GiveRoleByXP() {
             rows[i].xp_count <= cfgXP.level[j].max
           ) {
             const Guilds = bot.guilds.cache.get(cfg.guild);
-            var user = Guilds.members.cache.find((user) => user.id === rows[i].user_id );
-try {
-  var arg = user.roles.cache.some((role) => role.id === cfgXP.role[j]);
+            var user = Guilds.members.cache.find(
+              (user) => user.id === rows[i].user_id
+            );
+            try {
+              var arg = user.roles.cache.some(
+                (role) => role.id === cfgXP.role[j]
+              );
 
-  if (!arg) {
-    //RemoveUserRole(cfgXP.role, rows[i].user_id);
-    GiveUserRole(cfgXP.role[j], rows[i].user_id);
-  }
-} catch (error) {
-  console.log(`Id: ${rows[i].user_id} TypeError: Cannot read property 'roles' of undefined`)
-}
+              if (!arg) {
+                var roles = [];
+                var names = [];
+                for (var k = 0; k < cfgXP.role.length; k++) {
+                  if (cfgXP.role[k] != cfgXP.role[j]) {
+                    if(user.roles.cache.some((role) => role.id === cfgXP.role[k])){
+                    roles.push(cfgXP.role[k]);
+
+                    var role = Guilds.roles.cache.find((role) => role.id === cfgXP.role[k]);
+                    names.push(role.name);
+                    }
+                  }
+                }
+                console.log(names)
+
+                GiveUserRole(cfgXP.role[j], rows[i].user_id);
+              }
+            } catch (error) {
+              // console.log(`Id: ${rows[i].user_id} TypeError: Cannot read property 'roles' of undefined`)
+            }
           }
         }
       }
@@ -254,6 +292,7 @@ function GiveRoleByXP() {
   }, cfgXP.roleTimeout);
 }
 */
+
 function GiveUserRole(roleID, userID) {
   const Guilds = bot.guilds.cache.get(cfg.guild);
   var role = Guilds.roles.cache.find((role) => role.id === roleID);
@@ -261,12 +300,16 @@ function GiveUserRole(roleID, userID) {
   user.roles.add(role);
   logger(`Користувачу ${user.user.tag} видано роль ${role.name}`, "Role");
   const embed = new Discord.MessageEmbed()
-        .setURL("https://sded.cf/img/main.jpg")
-        .setAuthor("Система досвіду ", "https://sded.cf/img/main.jpg")
-        .setColor("#ff6700")
-        .setDescription(`**Вітаю 🎉 ${user.user.tag} , ви покращили свій рівень і здобули роль ${role.name} **`)
-        .setFooter("SDED Community")
-        .setThumbnail("https://media.forgecdn.net/avatars/67/361/636163095202189901.png");
+    .setURL("https://sded.cf/img/main.jpg")
+    .setAuthor("Система досвіду ", "https://sded.cf/img/main.jpg")
+    .setColor("#ff6700")
+    .setDescription(
+      `**Вітаю 🎉 ${user.user.tag} , ви покращили свій рівень і здобули роль ${role.name} **`
+    )
+    .setFooter("SDED Community")
+    .setThumbnail(
+      "https://media.forgecdn.net/avatars/67/361/636163095202189901.png"
+    );
   var chanell = bot.channels.cache.get(cfg.command_channel[0]);
   chanell.send(embed);
   chanell.send(`${user.user.toString()}`);
@@ -283,23 +326,24 @@ function RemoveUserRole(roleID, userID) {
 /*                                 AntiCommand                                */
 /* -------------------------------------------------------------------------- */
 function AntiCommand(msg) {
-  if(!msg.member.user.bot){
-   var arg = false;
-   if(msg.content.startsWith("-" || "." || "-")){
-    for (var i = 0; i < cfg.command_channel.length; i++) {
-      if(msg.channel.id == cfg.command_channel[i]){
-      arg = true; break;
+  if (!msg.member.user.bot) {
+    var arg = false;
+    if (msg.content.startsWith("-" || "." || "-")) {
+      for (var i = 0; i < cfg.command_channel.length; i++) {
+        if (msg.channel.id == cfg.command_channel[i]) {
+          arg = true;
+          break;
+        }
+      }
+      if (!arg) {
+        msg.delete();
+        bot.channels.cache
+          .get(cfg.command_channel[0])
+          .send(
+            `Агов! ${msg.author.toString()} для даних рухів є призначиний цей канал!`
+          );
       }
     }
-    if(!arg){
-      msg.delete();
-    bot.channels.cache
-      .get(cfg.command_channel[0])
-      .send(
-        `Агов! ${msg.author.toString()} для даних рухів є призначиний цей канал!`
-      );
-    }
-  }
   }
 }
 
@@ -333,9 +377,7 @@ bot.on("message", (msg) => {
   if (msg.content == "~getlog") {
     if (msg.author.id == cfg.admin_id) {
       msg.channel.send("Testing message.", {
-        files: [
-          "./log/last.txt"
-        ]
+        files: ["./log/last.txt"],
       });
       msg.delete;
     }
@@ -347,16 +389,20 @@ bot.on("message", (msg) => {
 
   /* ----------------------------------- --- ---------------------------------- */
   if (msg.content == "!myxp") {
-    db.query(`SELECT xp_count FROM xp WHERE user_id=${msg.author.id}`, function (err, rows) {
-      if(!err){
-        bot.channels.cache
-      .get(cfg.command_channel[0])
-      .send(
-        `${msg.author.toString()} Кількість вашого досвіду - ${rows[0].xp_count}`
-      );
+    db.query(
+      `SELECT xp_count FROM xp WHERE user_id=${msg.author.id}`,
+      function (err, rows) {
+        if (!err) {
+          bot.channels.cache
+            .get(cfg.command_channel[0])
+            .send(
+              `${msg.author.toString()} Кількість вашого досвіду - ${
+                rows[0].xp_count
+              }`
+            );
+        }
       }
-    });
-   
+    );
   }
 });
 /* ------------------------------ Admin command ----------------------------- */
@@ -366,17 +412,17 @@ bot.on("message", (msg) => {
       GiveRoleByXP();
     }
   }
-  });
+});
 
-  bot.on("message", (msg) => {
-    if (msg.content == "test123") {
-      if (msg.author.id == cfg.admin_id) {
-        const Guilds = bot.guilds.cache.get(cfg.guild);
-        const User = bot.fetchUser("475388811195580437");
-        console.log(User);
-      }
+bot.on("message", (msg) => {
+  if (msg.content == "test123") {
+    if (msg.author.id == cfg.admin_id) {
+      const Guilds = bot.guilds.cache.get(cfg.guild);
+      const User = bot.fetchUser("475388811195580437");
+      console.log(User);
     }
-    });
+  }
+});
 
 /* -------------------------------------------------------------------------- */
 /*                               Slash Commands                               */
@@ -388,22 +434,25 @@ const createAPIMessage = async (interaction, content) => {
     content
   )
     .resolveData()
-    .resolveFiles()
+    .resolveFiles();
 
-  return { ...data, files }
-}
+  return { ...data, files };
+};
 
-function AddCommands(){
-  bot.api.applications(bot.user.id).guilds(cfg.guild).commands.post({
-    data: {
+function AddCommands() {
+  bot.api
+    .applications(bot.user.id)
+    .guilds(cfg.guild)
+    .commands.post({
+      data: {
         name: "xp",
-        description: "Система досвіду"
-    },
-    data: {
-      name: "leaderboard",
-      description: "Таблиця лідерів"
-  }
-});
+        description: "Система досвіду",
+      },
+      data: {
+        name: "leaderboard",
+        description: "Таблиця лідерів",
+      },
+    });
 }
 
 bot.ws.on("INTERACTION_CREATE", async (interaction) => {
@@ -412,49 +461,88 @@ bot.ws.on("INTERACTION_CREATE", async (interaction) => {
 
   /* ----------------------------------- XP ----------------------------------- */
   if (command === "xp") {
-    db.query(`SELECT xp_count FROM xp WHERE user_id=${interaction.member.user.id}`, async function (err, rows) {
+    if(interaction.channel_id != cfg.command_channel[0]){
+      const Guilds = bot.guilds.cache.get(cfg.guild);
+      var tag = bot.channels.cache.get(cfg.command_channel[0]);
+      console.log(tag)
+bot.api.interactions(interaction.id, interaction.token).callback.post({
+          data: {
+            type: 4,
+            data:{content : `От халепа! Попробуй зробити те саме в ${tag}`}
+          },
+        });
+    }else{
+    db.query(
+      `SELECT xp_count FROM xp WHERE user_id=${interaction.member.user.id}`,
+      async function (err, rows) {
         const Guilds = bot.guilds.cache.get(cfg.guild);
         var embedDescription = "";
         for (var i = 0; i < cfgXP.role.length; i++) {
-          embedDescription +=  `${Guilds.roles.cache.find((role) => role.id === cfgXP.role[i]).name} - ${cfgXP.level[i].min} \n`;
+          embedDescription += `${
+            Guilds.roles.cache.find((role) => role.id === cfgXP.role[i]).name
+          } - ${cfgXP.level[i].min} \n`;
         }
         const embed = new Discord.MessageEmbed()
-        .setURL("https://sded.cf/img/main.jpg")
-        .setAuthor("Система досвіду ", "https://sded.cf/img/main.jpg")
-        .setColor("#ff6700")
-        .setDescription(`Проявляючи активність на сервері ви будете здобувати достід та підвищувати свій рівень !\n\n **Роль - досвід для отримання ** \n\n ${embedDescription} \n **Ваш досвід - ${rows[0].xp_count}**`)
-        .setFooter("SDED Community")
-        .setThumbnail("https://media.forgecdn.net/avatars/67/361/636163095202189901.png");
-     
-    let data = {
-      content: embed,
-    };
+          .setURL("https://sded.cf/img/main.jpg")
+          .setAuthor("Система досвіду ", "https://sded.cf/img/main.jpg")
+          .setColor("#ff6700")
+          .setDescription(
+            `Проявляючи активність на сервері ви будете здобувати достід та підвищувати свій рівень !\n\n **Роль - досвід для отримання ** \n\n ${embedDescription} \n **Ваш досвід - ${rows[0].xp_count}**`
+          )
+          .setFooter("SDED Community")
+          .setThumbnail(
+            "https://media.forgecdn.net/avatars/67/361/636163095202189901.png"
+          );
 
-    if (typeof embed === "object") {
-      data = await createAPIMessage(interaction, embed);
+        let data = {
+          content: embed,
+        };
+
+        if (typeof embed === "object") {
+          data = await createAPIMessage(interaction, embed);
+        }
+
+        bot.api.interactions(interaction.id, interaction.token).callback.post({
+          data: {
+            type: 4,
+            data,
+          },
+        });
+      }
+    );
     }
-
-    bot.api.interactions(interaction.id, interaction.token).callback.post({
-      data: {
-        type: 4,
-        data,
-      },
-    });
-    });
   }
   /* ------------------------------- Leaderboard ------------------------------ */
   if (command === "leaderboard") {
+    if(interaction.channel_id != cfg.command_channel[0]){
+      const Guilds = bot.guilds.cache.get(cfg.guild);
+      var tag = bot.channels.cache.get(cfg.command_channel[0]);
+      console.log(tag)
+bot.api.interactions(interaction.id, interaction.token).callback.post({
+          data: {
+            type: 4,
+            data:{content : `От халепа! Попробуй зробити те саме в ${tag}`}
+          },
+        });
+    }else{
     db.query(
       `select * FROM xp ORDER BY xp_count DESC`,
       async function (err, rows) {
         if (err) {
           logger(err, "db err");
         } else {
+          const Guilds = bot.guilds.cache.get(cfg.guild);
+          
           var content = "";
-  
-          for (var i = 0; i < 10; i++) {
+
+          for (var i = 0; i < cfgLEAD.rows; i++) {
+            var name = Guilds.members.cache.find((user) => user.id === rows[i].user_id);
+            content += `${i + 1}. ${name.user.username} - ${rows[i].xp_count} \n`;
+
+            /*old
             var name = rows[i].name.split("#");
             content += `${i + 1}. ${name[0]} - ${rows[i].xp_count} \n`;
+            */
           }
           const embed = new Discord.MessageEmbed()
             .setURL("https://sded.cf/img/main.jpg")
@@ -462,49 +550,51 @@ bot.ws.on("INTERACTION_CREATE", async (interaction) => {
             .setColor("#ff6700")
             .setDescription(content)
             .setFooter("SDED Community")
-            .setThumbnail("https://media.forgecdn.net/avatars/67/361/636163095202189901.png"
+            .setThumbnail(
+              "https://media.forgecdn.net/avatars/67/361/636163095202189901.png"
             );
-  
+
           let data = {
             content: embed,
           };
-  
+
           if (typeof embed === "object") {
             data = await createAPIMessage(interaction, embed);
           }
-  
-          bot.api.interactions(interaction.id, interaction.token).callback.post({
-            data: {
-              type: 4,
-              data,
-            },
-          });
+
+          bot.api
+            .interactions(interaction.id, interaction.token)
+            .callback.post({
+              data: {
+                type: 4,
+                data,
+              },
+            });
         }
       }
     );
   }
-  
+  }
 });
 
 /* -------------------------------------------------------------------------- */
 /*                                  Activity                                  */
 /* -------------------------------------------------------------------------- */
 
-function setActivity(){
-
+function setActivity() {
   bot.user.setPresence({
     activity: {
       name: " /xp",
       type: 0,
     },
-  })
+  });
   setTimeout(() => {
     bot.user.setPresence({
       activity: {
         name: " sded.cf",
         type: "WATCHING",
       },
-    })
+    });
   }, 5000);
 
   setTimeout(() => {
@@ -521,9 +611,104 @@ bot.on("ready", () => {
   voiceXP();
   GiveRoleByXP();
   AddCommands();
-  setActivity()
+  setActivity();
 });
 
 
+bot.on('guildMemberUpdate', (oldMember,newMember) => {
+
+  db.query(`SELECT * FROM xp WHERE user_id=${newMember.id}`, function (err, rows) {
+    if(!err){
+  for (var j = 0; j < cfgXP.role.length; j++) {
+    if (
+      rows[0].xp_count >= cfgXP.level[j].min &&
+      rows[0].xp_count <= cfgXP.level[j].max
+    ) {
+      const Guilds = bot.guilds.cache.get(cfg.guild);
+          var roles = [];
+          var names = [];
+          for (var k = 0; k < cfgXP.role.length; k++) {
+            if (cfgXP.role[k] != cfgXP.role[j]) {
+              if(newMember.roles.cache.some((role) => role.id === cfgXP.role[k])){
+              roles.push(cfgXP.role[k]);
+
+              var role = Guilds.roles.cache.find((role) => role.id === cfgXP.role[k]);
+              names.push(role.name);
+              }
+            }
+          }
+          if(roles.length > 0){
+          newMember.roles.remove(roles).then(logger(`Користувачу ${newMember.user.tag} видалено роль ${names}`, "Role"));
+          }
+        
+    }
+  }
+}
+});
+
+});
+
+bot.on('voiceStateUpdate', (oldState, newState) => {
+  var cfgVoice = JSON.parse(fs.readFileSync("./config/voicecontrol.json", "utf8"));
+  const Guilds = bot.guilds.cache.get(cfg.guild);
+  var name = "Кімната " + newState.member.user.username 
+
+  if(newState.channelID == cfgVoice.private){
+    Guilds.channels.create(name,{
+      type: "voice",
+    }).then((channel) => {
+      channel.setParent(cfgVoice.roomcat)
+
+      newState.member.voice.setChannel(channel.id)
+
+       let id = Guilds.roles.everyone.id;
+      channel.overwritePermissions([
+        {
+           id: id,
+           deny: ['CONNECT'],
+        },
+        {
+          id: newState.id,
+          allow: ['MANAGE_CHANNELS','MOVE_MEMBERS', 'CONNECT'],
+       },
+      ],);
+    })
+  }
+
+  if(newState.channelID == cfgVoice.create){
+    Guilds.channels.create(name,{
+      type: "voice",
+    }).then((channel) => {
+      channel.setParent(cfgVoice.roomcat)
+      newState.member.voice.setChannel(channel.id)
+    })
+  }
+
+});
+
+
+bot.on("message", (msg) => {
+  if (msg.content == "clear") {
+    deleteChannel()
+  }
+});
+
+function deleteChannel(){
+  var cfgVoice = JSON.parse(fs.readFileSync("./config/voicecontrol.json", "utf8"));
+  const Guilds = bot.guilds.cache.get(cfg.guild);
+  const channels = Guilds.channels.cache.filter(c => c.parentID === cfgVoice.roomcat && c.type === 'voice');
+  var count = 0;
+    for (const [id, voiceChannel] of channels) {
+     if(voiceChannel.members.size == 0){
+      voiceChannel.delete()
+      count++;
+     }
+    }
+    logger(`Видалено ${count} голосових каналів`, "VoiceChannels");
+
+    setTimeout(() => {
+      deleteChannel()
+    }, cfgVoice.deleteTimeout);
+}
 
 bot.login(process.env.DS_TOKEN);
