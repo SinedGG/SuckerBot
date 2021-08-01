@@ -415,11 +415,9 @@ bot.on("message", (msg) => {
 });
 
 bot.on("message", (msg) => {
-  if (msg.content == "test123") {
+  if (msg.content == "voiceclear") {
     if (msg.author.id == cfg.admin_id) {
-      const Guilds = bot.guilds.cache.get(cfg.guild);
-      const User = bot.fetchUser("475388811195580437");
-      console.log(User);
+      deleteChannel()
     }
   }
 });
@@ -612,6 +610,7 @@ bot.on("ready", () => {
   GiveRoleByXP();
   AddCommands();
   setActivity();
+  deleteChannel();
 });
 
 
@@ -686,12 +685,6 @@ bot.on('voiceStateUpdate', (oldState, newState) => {
 
 });
 
-
-bot.on("message", (msg) => {
-  if (msg.content == "clear") {
-    deleteChannel()
-  }
-});
 
 function deleteChannel(){
   var cfgVoice = JSON.parse(fs.readFileSync("./config/voicecontrol.json", "utf8"));
