@@ -534,13 +534,14 @@ bot.api.interactions(interaction.id, interaction.token).callback.post({
           var content = "";
 
           for (var i = 0; i < cfgLEAD.rows; i++) {
+            /*
             var name = Guilds.members.cache.find((user) => user.id === rows[i].user_id);
             content += `${i + 1}. ${name.user.username} - ${rows[i].xp_count} \n`;
-
-            /*old
+*/
+           
             var name = rows[i].name.split("#");
             content += `${i + 1}. ${name[0]} - ${rows[i].xp_count} \n`;
-            */
+            
           }
           const embed = new Discord.MessageEmbed()
             .setURL("https://sded.cf/img/main.jpg")
