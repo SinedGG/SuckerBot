@@ -619,6 +619,7 @@ bot.on('guildMemberUpdate', (oldMember,newMember) => {
 
   db.query(`SELECT * FROM xp WHERE user_id=${newMember.id}`, function (err, rows) {
     if(!err){
+      if(rows.length != 0){
   for (var j = 0; j < cfgXP.role.length; j++) {
     if (
       rows[0].xp_count >= cfgXP.level[j].min &&
@@ -644,6 +645,7 @@ bot.on('guildMemberUpdate', (oldMember,newMember) => {
     }
   }
 }
+    }
 });
 
 });
