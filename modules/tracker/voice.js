@@ -24,7 +24,7 @@ module.exports = (bot, db) =>{
     function addLog(user_id, action_type, sub_type, place){
         var date = moment().tz("Europe/Kiev").format("YYYY-MM-DD HH:mm:ss");
 
-        db.query(`INSERT tracker VALUES('${user_id}','', '${action_type}', '${sub_type}', '${place}', '${date}')`, err =>{
+        db.query(`INSERT tracker VALUES('${user_id}', '${action_type}', '${sub_type}', '${place}', '${date}')`, err =>{
             if(err){
                 console.log(err)
             }
