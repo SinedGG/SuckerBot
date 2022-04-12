@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" href="voice.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="main-frame">
+      <div class="side">
+          <br>
+          <label>SDED Community 💣</label> <br>
+          <button id="btn-select" onclick="voice()">🔊 | Голосові канали</button>
+          <button onclick="last_online()">📜 | Останній онлайн</button>
+      </div>
+      <div class="rows-frame">
+        <% for(var i = 0;i < data.user.length; i++) { %>
+          <div class="rows">
+            <div class="avatar-frame">
+              <img src="<%=data.avatar[i]%>" id="avatar">
+            </div>
+            <div class="text-frame">
+              <label><%=data.user[i]%> <%=data.action[i]%></label> <br>
+              <label><%=data.place[i]%></label>
+            </div>
+            <div class="date-frame">
+                <label><%=data.time[i]%></label> <br>
+                <label><%=data.date[i]%></label>
+            </div>
+          </div>
+          <% } %>
+          <div class="down-btm-form">
+            <button id="btn-next" onclick="next()">Далі</button>
+            <button id="btn-prev" onclick="prev()">Назад</button>
+          </div>
+      </div>
+      
+    </div>
+  </body>
+  <script>
+var page = parseInt('<%=page%>')
+
+function next() {
+  page+=1;
+  document.location.href = "/audit?page=" + page;
+}
+function prev() {
+  if (page - 1 >= 0) {
+    page-=1;
+    document.location.href = "/audit?page=" + page;
+  }
+}
+
+function last_online(){
+  document.location.href = "/last";
+}
+
+function voice(){
+  document.location.href = "/audit";
+}
+  </script>
+</html>
