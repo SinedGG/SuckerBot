@@ -18,6 +18,7 @@ bot.on("ready", () => {
   require("./modules/activity.js")(bot);
   require("./modules/voiceCreate.js")(bot);
   require("./modules/tracker/voice.js")(bot, db);
+ // require("./modules/tracker/last-online.js")(bot, db);
   const xp_system = require("./modules/xp.js");
   const voiceDelete = require("./modules/VoiceDelete.js");
    xp_system(bot, db);
@@ -33,22 +34,12 @@ const db = mysql.createPool({
   charset: "utf8mb4",
   multipleStatements: true,
 });
-/*
-var cfgXP = JSON.parse(fs.readFileSync("./config/xp.json", "utf8"));
-var cfgLEAD = JSON.parse(fs.readFileSync("./config/leaderboard.json", "utf8"));
-var cfg = JSON.parse(fs.readFileSync("./config/main.json", "utf8"));
 
 
 bot.on("messageCreate", (msg) => {
   if (msg.content == "test") {
   }
 });
-
-
-bot.on("presenceUpdate", (oldMember, newMember) => {
-  console.log(newMember)
-});
-*/
 
 
 
