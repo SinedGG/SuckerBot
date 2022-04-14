@@ -18,7 +18,7 @@ bot.on("ready", () => {
   require("./modules/activity.js")(bot);
   require("./modules/voiceCreate.js")(bot);
   require("./modules/tracker/voice.js")(bot, db);
- // require("./modules/tracker/last-online.js")(bot, db);
+  require("./modules/tracker/last-online.js")(bot, db);
   const xp_system = require("./modules/xp.js");
   const voiceDelete = require("./modules/VoiceDelete.js");
    xp_system(bot, db);

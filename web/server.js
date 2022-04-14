@@ -7,6 +7,10 @@ module.exports = (bot, db) => {
   var path = require("path");
   app.set("view engine", "ejs");
   app.use(express.static(__dirname + "/public/"));
+
+  const favicon = require('serve-favicon');
+  app.use(favicon(__dirname + '/public/icon/ico.png'));
+
   const moment = require("moment-timezone");
 
 
@@ -15,6 +19,10 @@ module.exports = (bot, db) => {
     var param = parseInt(req.query.page);
     if(param < 0 || param == undefined || isNaN(param)) param = 0;
     audit_page(res, param);
+  });
+
+  app.get("/last_online", (req, res) => {
+    online_page(res);
   });
 
 
@@ -52,6 +60,58 @@ module.exports = (bot, db) => {
           get_users_info(content,(test) => {
             setTimeout(() => {
               res.render(__dirname + "/voice.ejs", { data: test , page: offset});
+            }, 1500);
+           
+
+
+             
+          });
+        }
+      }
+    );
+  }
+  function online_page(res){
+    db.query(
+      `SELECT * from last_online`,
+      (err, rows) => {
+        if (err) {
+          console.log(err);
+        } else {
+
+          var content = {
+            avatar: [],
+            user: [],
+            desktop: [],
+            mobile: [],
+            web: [],
+          };
+          for (let i = 0; i < rows.length; i++) {
+            content.avatar.push(rows[i].user_id);
+            content.user.push(rows[i].user_id);
+            if(rows[i].desktop == 'online'){
+              content.desktop.push('Зараз онлайн')
+            }else if(rows[i].desktop_time == null){
+              content.desktop.push('Невідомо')
+            }else{
+              content.desktop.push(moment(rows[i].desktop_time).format("HH:mm:ss DD-MM-YYYY"))
+            }
+            if(rows[i].mobile == 'online'){
+              content.mobile.push('Зараз онлайн')
+            }else if(rows[i].mobile_time == null){
+              content.mobile.push('Невідомо')
+            }else{
+              content.mobile.push(moment(rows[i].mobile_time).format("HH:mm:ss DD-MM-YYYY"))
+            }if(rows[i].web == 'online'){
+              content.web.push('Зараз онлайн')
+            }else if(rows[i].web_time == null){
+              content.web.push('Невідомо')
+            }else{
+              content.web.push(moment(rows[i].web_time).format("HH:mm:ss DD-MM-YYYY"))
+            }
+          }
+          get_users_info(content,(test) => {
+            setTimeout(() => {
+              res.render(__dirname + "/last_online.ejs", { data: test });
             }, 1500);
            
 

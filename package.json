@@ -24,6 +24,7 @@
     "ejs": "^3.1.6",
     "express": "^4.17.3",
     "moment-timezone": "^0.5.34",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "serve-favicon": "^2.5.0"
   }
 }
