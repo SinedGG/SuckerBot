@@ -15,9 +15,6 @@ module.exports = (bot, db) => {
     }
 
     if (pass) {
-      console.log(oldState)
-      console.log(newState)
-
       var sql = null;
       var date = moment().tz("Europe/Kiev").format("YYYY-MM-DD HH:mm:ss");
 
@@ -49,7 +46,7 @@ module.exports = (bot, db) => {
         `;
       }
 
-      
+      if(oldState){
       if (
         oldState.clientStatus.hasOwnProperty("desktop") &&
         !newState.clientStatus.hasOwnProperty("desktop")
@@ -80,6 +77,7 @@ module.exports = (bot, db) => {
         ON DUPLICATE KEY UPDATE web = 'offline', web_time = '${date}'
         `;
       }
+    }
 
       if (sql != null) {
         db.query(sql, (err) => {
