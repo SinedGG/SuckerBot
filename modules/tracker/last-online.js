@@ -22,8 +22,7 @@ module.exports = (bot, db) => {
       var date = moment().tz("Europe/Kiev").format("YYYY-MM-DD HH:mm:ss");
 
       if (
-        newState.clientStatus.hasOwnProperty("desktop") &&
-        !oldState.clientStatus.hasOwnProperty("desktop")
+        newState.clientStatus.hasOwnProperty("desktop")
       ) {
         sql = `
         INSERT INTO last_online (user_id, desktop, desktop_time) VALUES
@@ -32,8 +31,7 @@ module.exports = (bot, db) => {
         `;
       }
       if (
-        newState.clientStatus.hasOwnProperty("mobile") &&
-        !oldState.clientStatus.hasOwnProperty("mobile")
+        newState.clientStatus.hasOwnProperty("mobile")
       ) {
         sql = `
         INSERT INTO last_online (user_id, mobile, mobile_time) VALUES
@@ -42,8 +40,7 @@ module.exports = (bot, db) => {
         `;
       }
       if (
-        newState.clientStatus.hasOwnProperty("web") &&
-        !oldState.clientStatus.hasOwnProperty("web")
+        newState.clientStatus.hasOwnProperty("web")
       ) {
         sql = `
         INSERT INTO last_online (user_id, web, web_time) VALUES
