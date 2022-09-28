@@ -1,0 +1,165 @@
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
+body {
+  background-color: #36393f;
+}
+
+.main-frame {
+  width: 830px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: row;
+}
+
+.side {
+  width: 210px;
+  height: 200px;
+  display: inline-block;
+  position: relative;
+  border-radius: 10px;
+  background-color: #2f3136;
+  margin-right: 10px;
+  border: solid black 0.1px;
+}
+.side label {
+  font-family: "Montserrat", sans-serif;
+  font-size: 15px;
+  color: whitesmoke;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.rows-frame {
+  width: 600px;
+  display: inline-block;
+  position: relative;
+}
+
+.rows {
+  background-color: #2f3136;
+  width: 600px;
+  height: 60px;
+  border-radius: 10px;
+  border: solid black 0.7px;
+  margin-top: 5px;
+}
+
+.avatar-frame {
+  display: inline-block;
+  vertical-align: middle;
+  width: 60px;
+  height: 50px;
+  margin: 5px;
+}
+
+.icon-frame {
+  display: inline-block;
+  vertical-align: middle;
+  width: 10px;
+  height: 10px;
+  margin: 5px;
+}
+
+.text-frame {
+  display: inline-block;
+  vertical-align: middle;
+  width: 400px;
+  height: 50px;
+  margin: 5px;
+}
+
+.date-frame {
+  display: inline-block;
+  vertical-align: middle;
+  width: 100px;
+  height: 50px;
+  text-align: center;
+  line-height: 150%;
+}
+
+label {
+  font-family: "Montserrat", sans-serif;
+  font-size: 15px;
+  color: whitesmoke;
+}
+
+.date-frame label {
+  font-family: "Montserrat", sans-serif;
+  font-size: 15px;
+  color: whitesmoke;
+}
+#avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.side button {
+  text-align: left;
+  cursor: pointer;
+  width: 200px;
+  height: 30px;
+  margin-top: 10px;
+  margin-left: 5px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  transition-duration: 0.2s;
+  font-family: "Montserrat", sans-serif;
+  font-size: 15px;
+  color: whitesmoke;
+}
+
+#btn-select {
+  background-color: #4c4d4e;
+  border-radius: 5px;
+}
+
+.side button:hover {
+  background-color: #4c4d4e;
+  border-radius: 5px;
+}
+
+.down-btm-form {
+  margin-top: 5px;
+  width: 600px;
+}
+.down-btm-form button {
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+  color: whitesmoke;
+  border-radius: 5px;
+  border: none;
+  background-color: #5d65f3;
+  width: 70px;
+  height: 30px;
+  transition-duration: 0.2s;
+}
+.down-btm-form button:hover {
+  background-color: #4752c4;
+}
+.down-btm-form #btn-next {
+  float: right;
+}
+.down-btm-form #btn-prev {
+  float: left;
+}
+
+.online-frame {
+  display: inline-block;
+  vertical-align: middle;
+  width: 195px;
+  height: 50px;
+  text-align: center;
+  line-height: 150%;
+}
+
+.rows-online {
+  background-color: #2f3136;
+  width: 600px;
+  height: 120px;
+  border-radius: 10px;
+  border: solid black 0.7px;
+  margin-top: 5px;
+}

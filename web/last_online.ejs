@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" href="voice.css" />
+    <title>SDED | Logger</title>
+  </head>
+  <body>
+    <div class="main-frame">
+      <div class="side">
+          <br>
+          <label>SDED Community 💣</label> <br>
+          <button  onclick="voice()">🔊 | Голосові канали</button>
+          <button id="btn-select" onclick="last_online()">📜 | Останній онлайн</button>
+      </div>
+      <div class="rows-frame">
+        <% for(var i = 0;i < data.user.length; i++) { %>
+          <div class="rows-online">
+            <div class="avatar-frame">
+              <img src="<%=data.avatar[i]%>" id="avatar">
+            </div>
+            <label><%=data.user[i]%></label> <br>
+            <div class="online-frame">
+              <label>Десктоп версія</label> <br>
+              <label><%=data.desktop[i]%></label>
+            </div>
+            <div class="online-frame">
+              <label>Мобільна версія</label> <br>
+              <label><%=data.mobile[i]%></label>
+            </div>
+            <div class="online-frame">
+              <label>Веб версія</label> <br>
+              <label><%=data.web[i]%></label>
+            </div>
+          </div>
+          <% } %>
+      </div>
+      
+    </div>
+  </body>
+  <script>
+
+function last_online(){
+  document.location.href = "/last_online";
+}
+
+function voice(){
+  document.location.href = "/audit";
+}
+  </script>
+</html>
